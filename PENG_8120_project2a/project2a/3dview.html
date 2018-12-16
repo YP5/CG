@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+
+<!--
+<p> </p>
+<button id="Button1">Increase Z</button>
+<button id="Button2">Decrease Z</button>
+<button id="Button3">Increase R</button>
+<button id="Button4">Decrease R</button>
+
+<p> </p>
+<button id="Button5">Increase theta</button>
+<button id="Button6">Decrease theta</button>
+<button id="Button7">Increase phi</button>
+<button id="Button8">Decrease phi</button>
+<p> </p>
+-->
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+
+  attribute  vec4 vPosition;
+attribute  vec4 vColor;
+varying vec4 fColor;
+
+uniform mat4 modelView;
+uniform mat4 projection;
+
+void main()
+{
+    gl_Position = projection*modelView*vPosition;
+    fColor = vColor;
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+
+  precision mediump float;
+
+varying vec4 fColor;
+
+void
+main()
+{
+    gl_FragColor = fColor;
+}
+</script>
+
+<script type="text/javascript" src="../Common/webgl-utils.js"></script>
+<script type="text/javascript" src="../Common/initShaders.js"></script>
+<script type="text/javascript" src="../Common/MV.js"></script>
+<script type="text/javascript" src="3dview.js"></script>
+<!--<script type="text/javascript" src="perspective.js"></script>-->
+
+
+<div class="wrapper">
+
+  <div class="column" style="float: left; position: relative;">
+    <canvas id="gl-canvas" width="512" height="512" style="border:1px solid">
+      Oops ... your browser doesn't support the HTML5 canvas element
+    </canvas>
+    <br />
+  </div>
+
+  <!---------------------------------------->
+  <div class="row" style="float: left; ">
+    <div class="column" style=" float: left;">
+      <span style="padding-right:2em">Move eye by: [X,Y,Z] </span>
+      -5
+      <input id="eyeXSlider" type="range" min="-5" max="5" step="0.1" value="0" />
+      <span style="padding-right:2em">5</span>
+    </div>
+
+    <div class="column" style=" float: left;">
+      -5
+      <input id="eyeYSlider" type="range" min="-5" max="5" step="0.1" value="0" />
+      <span style="padding-right:2em">5</span>
+    </div>
+
+    <div class="column" style=" float: left;">
+      -5
+      <input id="eyeZSlider" type="range" min="-5" max="5" step="0.1" value="0" />
+      5
+    </div>
+
+  </div>
+  <br />
+  <br />
+  <!---------------------------------------->
+  <div class="row" style="float: left;">
+    <div class="column" style=" float: left;">
+      <span style="padding-right:2.65em">Move at by: [X,Y,Z] </span>
+      -5
+      <input id="atXSlider" type="range" min="-5" max="5" step="0.1" value="0" />
+      <span style="padding-right:2em">5</span>
+    </div>
+
+    <div class="column" style=" float: left;">
+      -5
+      <input id="atYSlider" type="range" min="-5" max="5" step="0.1" value="0" />
+      <span style="padding-right:2em">5</span>
+    </div>
+
+    <div class="column" style=" float: left;">
+      -5
+      <input id="atZSlider" type="range" min="-5" max="5" step="0.1" value="0" />
+      5
+    </div>
+  </div>
+  <br />
+  <br />
+  <!---------------------------------------->
+  <div class="row" style="float: left;">
+    <div class="column" style=" float: left;">
+      <span style="padding-right:2.4em">Move up by: [X,Y,Z] </span>
+      -5
+      <input id="upXSlider" type="range" min="-5" max="5" step="0.1" value="0" />
+      <span style="padding-right:2em">5</span>
+    </div>
+
+    <div class="column" style=" float: left;">
+      -5
+      <input id="upYSlider" type="range" min="-5" max="5" step="0.1" value="0" />
+      <span style="padding-right:2em">5</span>
+    </div>
+
+    <div class="column" style=" float: left;">
+      -5
+      <input id="upZSlider" type="range" min="-5" max="5" step="0.1" value="0" />
+      5
+    </div>
+  </div>
+  <br />
+  <br />
+  <!---------------------------------------->
+
+  <div class="row" style="float: left; width:60%">
+    <div class="column" style=" float: left;">
+      <label>eye : </label><label id="eyePos"></label><br />
+      <label style="padding-right:0.7em">at : </label><label id="atPos"></label><br />
+      <label style="padding-right:0.4em">up : </label><label id="upPos"></label><br /><br />
+      <button id="ReturnCam">Return to Center</button>
+    </div>
+  </div>
+
+  <br />
+
+
+  <div class="row" style="float: left; width:60%">
+    <br />
+    <div class="column" style=" float: left; ">
+      <span style="padding-right:2.4em">Move near by: </span>
+      -3
+      <input id="nearSlider" type="range" min="-3" max="3" step="0.1" value="0" />
+      <span style="padding-right:2em">3</span>
+    </div>
+
+    <div class="column" style=" float: left;">
+      <span style="padding-right:2.4em">Move far by: </span>
+      -3
+      <input id="farSlider" type="range" min="-3" max="3" step="0.1" value="0" />
+      <span style="padding-right:2em">3</span>
+    </div>
+  </div>
+
+  <br />
+  <br />
+
+
+  <div class="row" style="float: left;">
+    <div class="column" style=" float: left; ">
+      <span style="padding-right:3em">Move fov by: </span>
+      -45
+      <input id="fovSlider" type="range" min="-45" max="135" step="1" value="45" />
+      <span style="padding-right:2em">135</span>
+    </div>
+
+  </div>
+
+  <div class="row" style="float: left; width:60%">
+    <br />
+    <div class="column" style=" float: left;">
+      <label>near : </label><label id="nearPos"></label><br />
+      <label style="padding-right:0.7em">far : </label><label id="farPos"></label><br />
+      <label style="padding-right:0.7em">fov : </label><label id="fovPos"></label><br /><br />
+      <button id="ReturnProj">Return to Original projection</button>
+    </div>
+  </div>
+  <br />
+  <br />
+
+</div>
+
+</html>
