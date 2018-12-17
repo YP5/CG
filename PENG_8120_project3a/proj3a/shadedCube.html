@@ -1,0 +1,372 @@
+light<!DOCTYPE html>
+<html>
+
+<button id = "ButtonX">Rotate X</button>
+<button id = "ButtonY">Rotate Y</button>
+<button id = "ButtonZ">Rotate Z</button>
+<button id = "ButtonT">Toggle Rotation</button>
+
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+attribute  vec4 vPosition;
+attribute  vec3 vNormal;
+varying vec4 fColor;
+
+uniform vec4 ambientProduct, diffuseProduct, specularProduct;
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+uniform vec4 lightPosition1;
+uniform vec4 lightPosition2;
+uniform vec4 lightPosition3;
+uniform float shininess;
+
+uniform bool light1On;
+uniform bool light2On;
+uniform bool light3On;
+
+void main()
+{
+
+    vec4 col1;
+    vec4 col2;
+    vec4 col3;
+    vec3 pos = -(modelViewMatrix * vPosition).xyz;
+    vec4 ambient = ambientProduct;
+
+    vec3 light;
+    vec3 L;
+    vec3 E;
+    vec3 H;
+    vec4 NN;
+    vec3 N;
+    float Kd;
+    float Ks;
+
+    if(light1On ){
+
+    light = lightPosition1.xyz;
+    L = normalize( light - pos );
+    E = normalize( -pos );
+    H = normalize( L + E );
+    NN = vec4(vNormal,0);
+    // Transform vertex normal into eye coordinat
+    N = normalize( (modelViewMatrix*NN).xyz);
+    // Compute terms in the illumination equation
+    Kd = max( dot(L, N), 0.0 );
+    vec4  diffuse1 = Kd*diffuseProduct;
+    Ks = pow( max(dot(N, H), 0.0), shininess );
+    vec4  specular1 = Ks * specularProduct;
+    if( dot(L, N) < 0.0 ) {
+	specular1 = vec4(0.0, 0.0, 0.0, 1.0);
+    }
+
+    col1 = diffuse1 +specular1 ;
+  }
+  else {
+    col2 = vec4(0,0,0,0);
+  }
+
+if(light2On ){
+    light = lightPosition2.xyz;
+    L = normalize( light - pos );
+    E = normalize( -pos );
+    H = normalize( L + E );
+    NN = vec4(vNormal,0);
+    // Transform vertex normal into eye coordinat
+    N = normalize( (modelViewMatrix*NN).xyz);
+    // Compute terms in the illumination equation
+    Kd = max( dot(L, N), 0.0 );
+    vec4 diffuse2 = Kd*diffuseProduct;
+    Ks = pow( max(dot(N, H), 0.0), shininess );
+    vec4  specular2 = Ks * specularProduct;
+    if( dot(L, N) < 0.0 ) {
+	specular2 = vec4(0.0, 0.0, 0.0, 1.0);
+    }
+
+    col2 = diffuse2 +specular2 ;
+  }
+  else {
+    col2 = vec4(0,0,0,0);
+  }
+
+if(light3On ){
+    light = lightPosition3.xyz;
+    L = normalize( light - pos );
+    E = normalize( -pos );
+    H = normalize( L + E );
+    NN = vec4(vNormal,0);
+    // Transform vertex normal into eye coordinat
+    N = normalize( (modelViewMatrix*NN).xyz);
+    // Compute terms in the illumination equation
+    Kd = max( dot(L, N), 0.0 );
+    vec4 diffuse3 = Kd*diffuseProduct;
+    Ks = pow( max(dot(N, H), 0.0), shininess );
+    vec4  specular3 = Ks * specularProduct;
+    if( dot(L, N) < 0.0 ) {
+	specular3 = vec4(0.0, 0.0, 0.0, 1.0);
+    }
+
+    col3 = diffuse3+specular3 ;
+  }
+  else {
+    col3 = vec4(0,0,0,0);
+  }
+
+    gl_Position = projectionMatrix * modelViewMatrix * vPosition;
+    fColor = ambient + col1+col2+col3;
+
+    fColor.a = 1.0;
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+
+#ifdef GL_ES
+precision highp float;
+#endif
+
+
+varying vec4 fColor;
+
+void
+main()
+{
+    gl_FragColor = fColor;
+}
+</script>
+
+<script type="text/javascript" src="../Common/webgl-utils.js"></script>
+<script type="text/javascript" src="../Common/initShaders.js"></script>
+<script type="text/javascript" src="../Common/MV.js"></script>
+<script type="text/javascript" src="dophins.js"></script>
+<script type="text/javascript" src="shadedCube.js"></script>
+
+<body>
+  <div class="wrapper">
+
+    <div class="column" style="float: left; position: relative;">
+      <canvas id="gl-canvas" width="512" height="512" style="border:1px solid">
+        Oops ... your browser doesn't support the HTML5 canvas element
+      </canvas>
+      <br /><br />
+
+      Change the Object:
+      <select id="changeObj">
+        <option value="Cube">Cube</option>
+        <option value="Dophin">Dophin</option>
+      </select><br /><br />
+
+      <input type="checkbox" id="light1" checked /> Light Source 1:<label id="lighhtLabl1"> </label><br />
+      <input type="checkbox" id="light2" checked /> Light Source 2:<label id="lighhtLabl2"> </label><br />
+      <input type="checkbox" id="light3" checked /> Light Source 3 (free to change slider):<label id="lighhtLabl3"> </label>
+      <br />
+      <div class="row" style="float: left; ">
+        <div class="column" style=" float: left;">
+
+          <label class="sliderMinLigPos"> -30</label>
+          <input id="light3XSlider" class="sliderLigPos" type="range" min="-30" max="30" step="0.1" value="1" style = "width:50px" />
+          <label style="padding-right:2em" class="sliderMaxLigPos">30</label>
+        </div>
+
+        <div class="column" style=" float: left;">
+          <label class="sliderMinLigPos"> -30</label>
+          <input id="light3YSlider" class="sliderLigPos" type="range" min="-30" max="30" step="0.1" value="0" style = "width:50px"/>
+          <label style="padding-right:2em" class="sliderMaxLigPos">30</label>
+        </div>
+
+        <div class="column" style=" float: left;">
+          <label class="sliderMinLigPos"> -30</label>
+          <input id="light3ZSlider" class="sliderLigPos" type="range" min="-30" max="30" step="0.1" value="0" style = "width:50px"/>
+          <label class="sliderMaxLigPos">30</label>
+        </div>
+
+      </div>
+
+<br /><br />
+      Change the Dophin View:
+      <select id="changeView">
+        <option value="Front">Front</option>
+        <option value="BLF">Bottom Left Front corner</option>
+        <option value="TLF">Top Left Front corner</option>
+        <option value="TRF">Top Right Front corner</option>
+        <option value="BRF">Bottom Right Front corner</option>
+        <option value="BLB">Bottom Left Back corner</option>
+        <option value="TLB">Top Left Back</option>
+        <option value="TRB">Top Right Back</option>
+        <option value="BRB">Bottom Right Back</option>
+      </select><br />
+
+<!--
+      Change the Object:
+      <select id="changeObj">
+        <option value="Cube">Cube</option>
+        <option value="Dophin">Dophin</option>
+      </select>
+-->
+      <br />
+    </div>
+
+    <!---------------------------------------->
+    <div class="row" style="float: left; ">
+      <div class="column" style=" float: left;">
+        <span style="padding-right:2em">lightAmbient: [R,G,B] </span>
+        <label class="sliderMin"> </label>
+        <input id="ambientRSlider" class="slider" type="range" min="-5" max="5" step="0.1" value="0" />
+        <label style="padding-right:2em" class="sliderMax">5</label>
+      </div>
+
+      <div class="column" style=" float: left;">
+        <label class="sliderMin"> </label>
+        <input id="ambientGSlider" class="slider" type="range" min="-5" max="5" step="0.1" value="0" />
+        <label style="padding-right:2em" class="sliderMax">5</label>
+      </div>
+
+      <div class="column" style=" float: left;">
+        <label class="sliderMin"> </label>
+        <input id="ambientBSlider" class="slider" type="range" min="-5" max="5" step="0.1" value="0" />
+        <label class="sliderMax">5</label>
+      </div>
+
+    </div>
+    <br />
+    <br />
+    <!---------------------------------------->
+    <div class="row" style="float: left;">
+      <div class="column" style=" float: left;">
+        <span style="padding-right:2.5em">lightDiffuse: [R,G,B] </span>
+        <label class="sliderMin"> </label>
+        <input id="diffuseRSlider" class="slider" type="range" min="-5" max="5" step="0.1" value="0" />
+        <label style="padding-right:2em" class="sliderMax">5</label>
+      </div>
+
+      <div class="column" style=" float: left;">
+        <label class="sliderMin"> </label>
+        <input id="diffuseGSlider" class="slider" type="range" min="-5" max="5" step="0.1" value="0" />
+        <label style="padding-right:2em" class="sliderMax">5</label>
+      </div>
+
+      <div class="column" style=" float: left;">
+        <label class="sliderMin"> </label>
+        <input id="diffuseBSlider" class="slider" type="range" min="-5" max="5" step="0.1" value="0" />
+        <label class="sliderMax">5</label>
+      </div>
+    </div>
+    <br />
+    <br />
+    <!---------------------------------------->
+    <div class="row" style="float: left;">
+      <div class="column" style=" float: left;">
+        <span style="padding-right:2.0em">lightSpecular: [R,G,B] </span>
+        <label class="sliderMin"> </label>
+        <input id="specularRSlider" class="slider" type="range" min="-5" max="5" step="0.1" value="0" />
+        <label style="padding-right:2em" class="sliderMax">5</label>
+      </div>
+
+      <div class="column" style=" float: left;">
+        <label class="sliderMin"> </label>
+        <input id="specularGSlider" class="slider" type="range" min="-5" max="5" step="0.1" value="0" />
+        <label style="padding-right:2em" class="sliderMax">5</label>
+      </div>
+
+      <div class="column" style=" float: left;">
+        <label class="sliderMin"> </label>
+        <input id="specularBSlider" class="slider" type="range" min="-5" max="5" step="0.1" value="0" />
+        <label class="sliderMax">5</label>
+      </div>
+    </div>
+    <br />
+    <br />
+
+    <!---------------------------------------->
+    <div class="material" style="float: left;">
+      <div class="column" style=" float: left;">
+        <span style="padding-right:0.5em">materialAbmient: [R,G,B] </span>
+        <label class="sliderMin"> </label>
+        <input id="mAmbientRSlider" class="slider" type="range" min="-5" max="5" step="0.1" value="0" />
+        <label style="padding-right:2em" class="sliderMax">5</label>
+      </div>
+
+      <div class="column" style=" float: left;">
+        <label class="sliderMin"> </label>
+        <input id="mAmbientGSlider" class="slider" type="range" min="-5" max="5" step="0.1" value="0" />
+        <label style="padding-right:2em" class="sliderMax">5</label>
+      </div>
+
+      <div class="column" style=" float: left;">
+        <label class="sliderMin"> </label>
+        <input id="mAmbientBSlider" class="slider" type="range" min="-5" max="5" step="0.1" value="0" />
+        <label class="sliderMax">5</label>
+      </div>
+    </div>
+    <br />
+    <br />
+
+    <!---------------------------------------->
+    <div class="material" style="float: left;">
+      <div class="column" style=" float: left;">
+        <span style="padding-right:1.0em">materialDiffuse: [R,G,B] </span>
+        <label class="sliderMin"> </label>
+        <input id="mDiffuseRSlider" class="slider" type="range" min="-5" max="5" step="0.1" value="0" />
+        <label style="padding-right:2em" class="sliderMax">5</label>
+      </div>
+
+      <div class="column" style=" float: left;">
+        <label class="sliderMin"> </label>
+        <input id="mDiffuseGSlider" class="slider" type="range" min="-5" max="5" step="0.1" value="0" />
+        <label style="padding-right:2em" class="sliderMax">5</label>
+      </div>
+
+      <div class="column" style=" float: left;">
+        <label class="sliderMin"> </label>
+        <input id="mDiffuseBSlider" class="slider" type="range" min="-5" max="5" step="0.1" value="0" />
+        <label class="sliderMax">5</label>
+      </div>
+    </div>
+    <br />
+    <br />
+
+    <!---------------------------------------->
+    <div class="material" style="float: left;">
+      <div class="column" style=" float: left;">
+        <span style="padding-right:0.5em">materialSpecular: [R,G,B] </span>
+        <label class="sliderMin"> </label>
+        <input id="mSpecularRSlider" class="slider" type="range" min="-5" max="5" step="0.1" value="0" />
+        <label style="padding-right:2em" class="sliderMax">5</label>
+      </div>
+
+      <div class="column" style=" float: left;">
+        <label class="sliderMin"> </label>
+        <input id="mSpecularGSlider" class="slider" type="range" min="-5" max="5" step="0.1" value="0" />
+        <label style="padding-right:2em" class="sliderMax">5</label>
+      </div>
+
+      <div class="column" style=" float: left;">
+        <label class="sliderMin"> </label>
+        <input id="mSpecularBSlider" class="slider" type="range" min="-5" max="5" step="0.1" value="0" />
+        <label class="sliderMax">5</label>
+      </div>
+    </div>
+    <br />
+    <br />
+
+
+    <!---------------------------------------->
+    <div class="material" style="float: left; width: 40%">
+      <div class="column" style=" float: left; ">
+        <span style="padding-right:0.5em">Material Shiness: </span>
+        <label class="sliderMin2"> 0</label>
+        <input id="mShinSlider" class="slider2" type="range" min="0" max="500" step="1" value="100" />
+        <label style="padding-right:2em" class="sliderMax2">500</label>
+      </div>
+
+
+    </div>
+    <br />
+    <br />
+
+
+    <br />
+
+  </div>
+</body>
+</html>
