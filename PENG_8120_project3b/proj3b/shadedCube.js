@@ -303,10 +303,11 @@ fragmentShaderGouraud = gl.createShader(gl.FRAGMENT_SHADER);
     gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vPosition);
 
+/*
     var indexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices_d1.concat(indices_d2).concat(indices_d3)), gl.STATIC_DRAW);
-
+*/
 
     thetaLoc = gl.getUniformLocation(program, "theta");
 
@@ -692,7 +693,7 @@ function drawBld(){
   gl.uniformMatrix4fv(gl.getUniformLocation(program,
     "modelViewMatrix"), false, flatten(modelView));
 
-  gl.drawArrays(gl.TRIANGLES, dopVert.length+numVertices+teapot_model.Vertices.length, teapot_model.Vertices.length);
+  gl.drawArrays(gl.TRIANGLES, dopVert.length+numVertices+teapot_model.Vertices.length, NTU_CSIE_Building.Vertices.length);
 }
 
 var sliderMaxLigPos = 30;
