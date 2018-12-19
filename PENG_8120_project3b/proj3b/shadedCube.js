@@ -68,6 +68,11 @@ var lightPosition2Cube = vec4(0.0, 0.0, 5.0, 0.0 );
 var lightPosition1Cube = vec4(0.0, 5.0, 0.0, 0.0 );
 var lightPosition2Dop = vec4(0.0, .0, 500.0, 0.0 );
 var lightPosition1Dop = vec4(0, 500.0, 0.0, 0.0 );
+var lightPosition2Tea = vec4(0.0, 0.0, 500.0, 0.0 );
+var lightPosition1Tea = vec4(0.0, 500.0, 0.0, 0.0 );
+var lightPosition2Bld = vec4(0.0, .0, 500.0, 0.0 );
+var lightPosition1Bld = vec4(0, 500.0, 0.0, 0.0 );
+
 var lightPositionFreeCube = vec4(1.0, 0.0, 0.0, 0.0 );
 var lightPositionFreeDop = vec4(100.0, 0.0, 0.0, 0.0 );
 var lightPositionFreeBld = vec4(100.0, 0.0, 500.0, 0.0 );
@@ -646,8 +651,8 @@ function drawCube() {
 function drawTeapot(){
 
 
-  document.getElementById("lighhtLabl1").innerHTML = "[" +lightPosition1Cube +"]"
-  document.getElementById("lighhtLabl2").innerHTML = "[" + lightPosition2Cube +"]"
+  document.getElementById("lighhtLabl1").innerHTML = "[" +lightPosition1Tea +"]"
+  document.getElementById("lighhtLabl2").innerHTML = "[" + lightPosition2Tea +"]"
  document.getElementById("lighhtLabl3").innerHTML = "[" +lightPositionFree+ "]"
 
   projection = projectionTeapot;
@@ -668,9 +673,9 @@ function drawTeapot(){
   gl.uniform4fv(gl.getUniformLocation(program, "specularProduct"),
     flatten(specularProduct));
   gl.uniform4fv(gl.getUniformLocation(program, "lightPosition1"),
-    flatten(lightPosition1Cube));
+    flatten(lightPosition1Tea));
   gl.uniform4fv(gl.getUniformLocation(program, "lightPosition2"),
-    flatten(lightPosition2Cube));
+    flatten(lightPosition2Tea));
   gl.uniform4fv(gl.getUniformLocation(program, "lightPosition3"),
     flatten(lightPositionFree));
 
@@ -686,8 +691,8 @@ function drawTeapot(){
 
 function drawBld(){
 
-  document.getElementById("lighhtLabl1").innerHTML = "[" +lightPosition1Cube +"]"
-  document.getElementById("lighhtLabl2").innerHTML = "[" + lightPosition2Cube +"]"
+  document.getElementById("lighhtLabl1").innerHTML = "[" +lightPosition1Bld +"]"
+  document.getElementById("lighhtLabl2").innerHTML = "[" + lightPosition2Bld +"]"
  document.getElementById("lighhtLabl3").innerHTML = "[" +lightPositionFree+ "]"
 
   projection = projectionBld;
@@ -708,9 +713,9 @@ function drawBld(){
   gl.uniform4fv(gl.getUniformLocation(program, "specularProduct"),
     flatten(specularProduct));
   gl.uniform4fv(gl.getUniformLocation(program, "lightPosition1"),
-    flatten(lightPosition1Cube));
+    flatten(lightPosition1Bld));
   gl.uniform4fv(gl.getUniformLocation(program, "lightPosition2"),
-    flatten(lightPosition2Cube));
+    flatten(lightPosition2Bld));
   gl.uniform4fv(gl.getUniformLocation(program, "lightPosition3"),
     flatten(lightPositionFree));
 
@@ -739,19 +744,19 @@ function initObj() {
     sliderMaxLigPos = sliderMaxLigPosDop;
     sliderMinLigPos = sliderMinLigPosDop;
     visb = "hidden";
-  //  lightPositionFree = lightPositionFreeDop.slice();
+    lightPositionFree = lightPositionFreeDop.slice();
   break;
     case 'Teapot':
     sliderMaxLigPos = sliderMaxLigPosTeapot;
     sliderMinLigPos = sliderMinLigPosTeapot;
     visb = "visible";
-//    lightPositionFree = lightPositionFreeTeapot.slice();
+    lightPositionFree = lightPositionFreeTeapot.slice();
     break;
     case 'NTU':
     sliderMaxLigPos = sliderMaxLigPosBld;
     sliderMinLigPos = sliderMinLigPosBld;
     visb = "visible";
-  //  lightPositionFree = lightPositionFreeTeapot.slice();
+    lightPositionFree = lightPositionFreeTeapot.slice();
       break;
   }
 
