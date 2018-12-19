@@ -56,13 +56,12 @@ var materialSpecular = materialSpecularIni.slice();
 var materialShininess = materialShininessIni;
 
 var inits = flatten([
-  lightAmbient,
-  lightDiffuse,
-  lightSpecular,
-  materialAmbient,
-  materialDiffuse,
-  materialSpecular,
-  materialShininess
+  lightAmbient.slice(0,3),
+  lightDiffuse.slice(0,3),
+  lightSpecular.slice(0,3),
+  materialAmbient.slice(0,3),
+  materialDiffuse.slice(0,3),
+  materialSpecular.slice(0,3)
 ]);
 
 var lightPosition2Cube = vec4(0.0, 0.0, 5.0, 0.0 );
@@ -70,21 +69,25 @@ var lightPosition1Cube = vec4(0.0, 5.0, 0.0, 0.0 );
 var lightPosition2Dop = vec4(0.0, .0, 500.0, 0.0 );
 var lightPosition1Dop = vec4(0, 500.0, 0.0, 0.0 );
 var lightPositionFreeCube = vec4(1.0, 0.0, 0.0, 0.0 );
-var lightPositionFreeDop = vec4(500.0, 0.0, 0.0, 0.0 );
-var lightPositionFree = lightPositionFreeCube.slice();
+var lightPositionFreeDop = vec4(100.0, 0.0, 0.0, 0.0 );
+var lightPositionFreeBld = vec4(100.0, 0.0, 0.0, 0.0 );
+
+var lightPositionFreeTeapot = vec4(300.0, 0.0, 0.0, 0.0 );
+var lightPositionFree = lightPositionFreeTeapot.slice();
 
 
 var sliderMaxLigPosDop = 2000;
 var sliderMinLigPosDop = -2000;
 var sliderMaxLigPosCube = 30;
 var sliderMinLigPosCube = -30;
-var sliderMaxLigPosTeapot = 500;
-var sliderMinLigPosTeapot = -500;
-var sliderMaxLigPosBld = 500;
-var sliderMinLigPosBld = -500;
+var sliderMaxLigPosBld = 1000;
+var sliderMinLigPosBld = -1000;
 var sliderCamMax = 1;
 var sliderCamMin = -1;
 var initCam = [0,0,1,0,0,0,0,1,0];
+
+var sliderMaxLigPosTeapot = 2000;
+var sliderMinLigPosTeapot = -2000;
 
 var modelView, projection;
 var projectionDop = ortho(-500, 500, -500, 500, -500, 500);
@@ -186,7 +189,6 @@ function colorCube()
     quad( 4, 5, 6, 7 );
     quad( 5, 4, 0, 1 );
 
-    console.log(pointsArray);
 }
 
 var dopNorm = [];
@@ -243,12 +245,7 @@ window.onload = function init() {
     var fragmentShaderSourceGouraud =document.getElementById("fragment-shaderGouraud").text;
     var vertexShaderSourcePhong =document.getElementById("vertex-shaderPhong").text;
     var fragmentShaderSourcePhong =document.getElementById("fragment-shaderPhong").text;
-/*
-    vertexShaderGouraud = createShader(gl, gl.VERTEX_SHADER, vertexShaderSourceGouraud);
-    fragmentShaderGouraud = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSourceGouraud);
-    vertexShaderPhong = createShader(gl, gl.VERTEX_SHADER, vertexShaderSourcePhong);
-    fragmentShaderPhong= createShader(gl, gl.FRAGMEN_SHADER, fragmentShaderSourcePhong);
-*/
+
 gl.enable(gl.BLEND);
 
 vertexShaderGouraud = gl.createShader(gl.VERTEX_SHADER);
@@ -265,9 +262,12 @@ fragmentShaderGouraud = gl.createShader(gl.FRAGMENT_SHADER);
   gl.shaderSource(fragmentShaderPhong,fragmentShaderSourcePhong);
   gl.compileShader(fragmentShaderPhong);
 
+
     program = gl.createProgram();
     gl.attachShader(program, vertexShaderGouraud);
     gl.attachShader(program, fragmentShaderGouraud);
+  //  gl.attachShader(program, vertexShaderPhong);
+//    gl.attachShader(program, fragmentShaderPhong);
     gl.linkProgram(program);
 
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
@@ -359,12 +359,22 @@ fragmentShaderGouraud = gl.createShader(gl.FRAGMENT_SHADER);
            gl.detachShader(program, fragmentShaderPhong);
            gl.attachShader(program, vertexShaderGouraud);
            gl.attachShader(program, fragmentShaderGouraud);
+           gl.linkProgram(program);
+
+           if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+               alert("Could not initialise shaders");
+           }
            break;
            case "fragment":
            gl.detachShader(program, vertexShaderGouraud);
            gl.detachShader(program, fragmentShaderGouraud);
            gl.attachShader(program, vertexShaderPhong);
            gl.attachShader(program, fragmentShaderPhong);
+           gl.linkProgram(program);
+
+           if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+               alert("Could not initialise shaders");
+           }
            break;
          }
 
@@ -770,7 +780,10 @@ function initObj() {
     x[i].innerHTML = sliderCamMin;
   }
 
+  document.getElementById("lighhtLabl3").innerHTML = "[" +lightPositionFree+ "]"
+
 }
+
 
 var fac = 1;
 
@@ -809,6 +822,7 @@ function changeView(){
 
 
 function checkCam() {
+  saveat = at;
   var lookatV = subtract(at, eye);
   var upAdj = up.slice();
 
@@ -819,7 +833,14 @@ function checkCam() {
 
   if (length(lookatV) == 0) {
     console.warn("look at vector cannot be zero in length.");
-    at = add(eye, vec3(0, 0, 1.0));
+    if (eye[2] == 0) {
+      at = add(eye, vec3(0, 0, -0.1));
+    } else {
+      at = add(eye, vec3(0, 0, -0.1));
+      if (at[2] <sliderCamMin) {
+        at[2] = add(eye, vec3(0, 0, 0.1));
+      }
+    }
   }
 
   var dircheck = dot(normalize(lookatV), normalize(upAdj));
@@ -830,12 +851,11 @@ function checkCam() {
 
     var axis, tf; // tf: rotate about an axis not along lookatV
     if (lookatV[0] != 0 & lookatV[1] == 0 & lookatV[2] == 0) { // along a principle plane
-      tf = rotate(10, vec4(0, 1.0, 0,1.0));
+      tf = rotate(10, vec4(0, 1.0, 0, 1.0));
     } else {
-      tf = rotate(10, vec4(1.0, 0, 0,1.0));
+      tf = rotate(10, vec4(1.0, 0, 0, 1.0));
     }
-    up = multMV(tf, vec4(lookatV)).slice(0,3);
-        console.log(up);
+    up = multMV(tf, vec4(lookatV)).slice(0, 3);
   }
 
 
