@@ -192,6 +192,7 @@ function colorCube()
 }
 
 var dopNorm = [];
+var dopVert  = [];
 function quadTri(a, b, c) {
   var t1 = subtract(vertices[b], vertices[a]);
   var t2 = subtract(vertices[c], vertices[b]);
@@ -199,8 +200,11 @@ function quadTri(a, b, c) {
   var normal = vec3(normal);
   normal = normalize(normal);
 
+dopVert.push(vertices[a]);
   dopNorm.push(normal); // one for each indexed point
+  dopVert.push(vertices[b]);
   dopNorm.push(normal);
+  dopVert.push(vertices[c]);
   dopNorm.push(normal);
 }
 
@@ -293,7 +297,7 @@ fragmentShaderGouraud = gl.createShader(gl.FRAGMENT_SHADER);
 
     var vBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(vertices.concat(pointsArray).concat(TeapotVertices).concat(NTUVertices)), gl.STATIC_DRAW );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(dopVert.concat(pointsArray).concat(TeapotVertices).concat(NTUVertices)), gl.STATIC_DRAW );
 
     var vPosition = gl.getAttribLocation(program, "vPosition");
     gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
@@ -541,7 +545,8 @@ function drawDophin() {
   gl.uniform4fv(gl.getUniformLocation(program, "specularProduct"), flatten(specularProduct));
   gl.uniform1f(gl.getUniformLocation(program, "shininess"), Ns1);
 
-  gl.drawElements(gl.TRIANGLES, indices_d1.length, gl.UNSIGNED_SHORT, 0);
+  //gl.drawElements(gl.TRIANGLES, indices_d1.length, gl.UNSIGNED_SHORT, 0);
+gl.drawArrays(gl.TRIANGLES, 0, indices_d1.length);
 
   ambientProduct = mult(lightAmbient, ka2);
   diffuseProduct = mult(lightDiffuse, kd2);
@@ -552,7 +557,8 @@ function drawDophin() {
   gl.uniform4fv(gl.getUniformLocation(program, "specularProduct"), flatten(specularProduct));
   gl.uniform1f(gl.getUniformLocation(program, "shininess"), Ns2);
 
-  gl.drawElements(gl.TRIANGLES, indices_d2.length, gl.UNSIGNED_SHORT, indices_d1.length * 2);
+  //gl.drawElements(gl.TRIANGLES, indices_d2.length, gl.UNSIGNED_SHORT, indices_d1.length * 2);
+gl.drawArrays(gl.TRIANGLES, indices_d1.length, indices_d2.length);
 
   ambientProduct = mult(lightAmbient, ka3);
   diffuseProduct = mult(lightDiffuse, kd3);
@@ -563,8 +569,8 @@ function drawDophin() {
   gl.uniform4fv(gl.getUniformLocation(program, "specularProduct"), flatten(specularProduct));
   gl.uniform1f(gl.getUniformLocation(program, "shininess"), Ns3);
 
-  gl.drawElements(gl.TRIANGLES, indices_d3.length, gl.UNSIGNED_SHORT, (indices_d1.length + indices_d2.length) * 2);
-
+//  gl.drawElements(gl.TRIANGLES, indices_d3.length, gl.UNSIGNED_SHORT, (indices_d1.length + indices_d2.length) * 2);
+gl.drawArrays(gl.TRIANGLES, indices_d1.length+indices_d2.length, indices_d3.length);
 }
 
 function drawCube() {
@@ -607,7 +613,7 @@ function drawCube() {
   gl.uniformMatrix4fv(gl.getUniformLocation(program,
     "modelViewMatrix"), false, flatten(modelView));
 
-  gl.drawArrays(gl.TRIANGLES, vertices.length, numVertices);
+  gl.drawArrays(gl.TRIANGLES, dopVert.length, numVertices);
 
 }
 
@@ -647,7 +653,7 @@ function drawTeapot(){
   gl.uniformMatrix4fv(gl.getUniformLocation(program,
     "modelViewMatrix"), false, flatten(modelView));
 
-  gl.drawArrays(gl.TRIANGLES, vertices.length+numVertices, teapot_model.Vertices.length);
+  gl.drawArrays(gl.TRIANGLES, dopVert.length+numVertices, teapot_model.Vertices.length);
 }
 
 
@@ -686,7 +692,7 @@ function drawBld(){
   gl.uniformMatrix4fv(gl.getUniformLocation(program,
     "modelViewMatrix"), false, flatten(modelView));
 
-  gl.drawArrays(gl.TRIANGLES, vertices.length+numVertices+teapot_model.Vertices.length, teapot_model.Vertices.length);
+  gl.drawArrays(gl.TRIANGLES, dopVert.length+numVertices+teapot_model.Vertices.length, teapot_model.Vertices.length);
 }
 
 var sliderMaxLigPos = 30;
