@@ -114,7 +114,7 @@ for (i = 0; i < NTU_CSIE_Building.Vertices.length; i++) {
 
 var NTUNormals  = [];
 for (i = 0; i <NTU_CSIE_Building.Normals.length; i++) {
-  NTUNormals.push(vec4(NTU_CSIE_Building.Normals[i],1.0))
+  NTUNormals.push(vec4(NTU_CSIE_Building.Normals[i]))
 }
 var TeapotVertices = [];
 for (i = 0; i <teapot_model.Vertices.length; i++) {
@@ -227,6 +227,27 @@ function normDoph() {
 }
 
 
+function quadTriTeapot(a, b, c) {
+  var t1 = subtract(b, a);
+  var t2 = subtract(c, b);
+  var normal = cross(t1, t2);
+  var normal = vec3(normal);
+  normal = normalize(normal);
+
+  teapotNormsbyInterp.push(normal); // one for each indexed point
+  teapotNormsbyInterp.push(normal);
+  teapotNormsbyInterp.push(normal);
+}
+
+var teapotNormsbyInterp = [];
+function normTeapot(){
+  for (var i = 0;i < TeapotVerts.length-2;i++) {
+    quadTriTeapot(TeapotVerts[i],TeapotVerts[i+1],TeapotVerts[i+2]);
+    i = i+3;
+  }
+  teapotNormsbyInterp.push(teapotNormsbyInterp[TeapotVerts.length-2]);
+  teapotNormsbyInterp.push(teapotNormsbyInterp[TeapotVerts.length-1]);
+}
 
 
 var vertexShaderGouraud;
@@ -286,10 +307,13 @@ fragmentShaderGouraud = gl.createShader(gl.FRAGMENT_SHADER);
     initObj();
     colorCube();
     normDoph();
+    normTeapot();
 
     var nBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, nBuffer );
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(dopNorm.concat(normalsArray).concat(TeapotNormals).concat(NTUNormals)), gl.STATIC_DRAW );
+    //gl.bufferData( gl.ARRAY_BUFFER, flatten(dopNorm.concat(normalsArray).concat(TeapotNormals).concat(NTUNormals)), gl.STATIC_DRAW );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(dopNorm.concat(normalsArray).concat(TeapotNorms).concat(NTUNormals)), gl.STATIC_DRAW );
+  //gl.bufferData( gl.ARRAY_BUFFER, flatten(dopNorm.concat(normalsArray).concat(teapotNormsbyInterp).concat(NTUNormals)), gl.STATIC_DRAW );
 
     var vNormal = gl.getAttribLocation( program, "vNormal" );
     gl.vertexAttribPointer( vNormal, 3, gl.FLOAT, false, 0, 0 );
@@ -297,7 +321,8 @@ fragmentShaderGouraud = gl.createShader(gl.FRAGMENT_SHADER);
 
     var vBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(dopVert.concat(pointsArray).concat(TeapotVertices).concat(NTUVertices)), gl.STATIC_DRAW );
+    //gl.bufferData( gl.ARRAY_BUFFER, flatten(dopVert.concat(pointsArray).concat(TeapotVertices).concat(NTUVertices)), gl.STATIC_DRAW );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(dopVert.concat(pointsArray).concat(TeapotVerts).concat(NTUVertices)), gl.STATIC_DRAW );
 
     var vPosition = gl.getAttribLocation(program, "vPosition");
     gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
@@ -654,7 +679,8 @@ function drawTeapot(){
   gl.uniformMatrix4fv(gl.getUniformLocation(program,
     "modelViewMatrix"), false, flatten(modelView));
 
-  gl.drawArrays(gl.TRIANGLES, dopVert.length+numVertices, teapot_model.Vertices.length);
+  //gl.drawArrays(gl.TRIANGLES, dopVert.length+numVertices, teapot_model.Vertices.length);
+  gl.drawArrays(gl.TRIANGLES, dopVert.length+numVertices, TeapotVerts.length);
 }
 
 
@@ -693,7 +719,7 @@ function drawBld(){
   gl.uniformMatrix4fv(gl.getUniformLocation(program,
     "modelViewMatrix"), false, flatten(modelView));
 
-  gl.drawArrays(gl.TRIANGLES, dopVert.length+numVertices+teapot_model.Vertices.length, NTU_CSIE_Building.Vertices.length);
+  gl.drawArrays(gl.TRIANGLES, dopVert.length+numVertices+ TeapotVerts.length, NTU_CSIE_Building.Vertices.length);
 }
 
 var sliderMaxLigPos = 30;
