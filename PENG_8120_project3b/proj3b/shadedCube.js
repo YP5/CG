@@ -70,9 +70,9 @@ var lightPosition2Dop = vec4(0.0, .0, 500.0, 0.0 );
 var lightPosition1Dop = vec4(0, 500.0, 0.0, 0.0 );
 var lightPositionFreeCube = vec4(1.0, 0.0, 0.0, 0.0 );
 var lightPositionFreeDop = vec4(100.0, 0.0, 0.0, 0.0 );
-var lightPositionFreeBld = vec4(100.0, 0.0, 0.0, 0.0 );
+var lightPositionFreeBld = vec4(100.0, 0.0, 500.0, 0.0 );
 
-var lightPositionFreeTeapot = vec4(300.0, 0.0, 0.0, 0.0 );
+var lightPositionFreeTeapot = vec4(300.0, 0.0, 500.0, 0.0 );
 var lightPositionFree = lightPositionFreeTeapot.slice();
 
 
@@ -114,7 +114,7 @@ for (i = 0; i < NTU_CSIE_Building.Vertices.length; i++) {
 
 var NTUNormals  = [];
 for (i = 0; i <NTU_CSIE_Building.Normals.length; i++) {
-  NTUNormals.push(vec4(NTU_CSIE_Building.Normals[i]))
+  NTUNormals.push(vec3(NTU_CSIE_Building.Normals[i]))
 }
 var TeapotVertices = [];
 for (i = 0; i <teapot_model.Vertices.length; i++) {
@@ -123,7 +123,7 @@ for (i = 0; i <teapot_model.Vertices.length; i++) {
 
 var TeapotNormals  = [];
 for (i = 0; i <teapot_model.Normals.length; i++) {
-  TeapotNormals.push(vec4(teapot_model.Normals[i],1.0))
+  TeapotNormals.push(vec3(teapot_model.Normals[i]))
 }
 
 
