@@ -42,15 +42,17 @@ void main()
     float Kd;
     float Ks;
 
+    NN = vec4(vNormal,0);
+    // Transform vertex normal into eye coordinat
+    N = normalize( (modelViewMatrix*NN).xyz);
+
     if(light1On ){
 
     light = lightPosition1.xyz;
     L = normalize( light - pos );
     E = normalize( -pos );
     H = normalize( L + E );
-    NN = vec4(vNormal,0);
-    // Transform vertex normal into eye coordinat
-    N = normalize( (modelViewMatrix*NN).xyz);
+
     // Compute terms in the illumination equation
     Kd = max( dot(L, N), 0.0 );
     vec4  diffuse1 = Kd*diffuseProduct;
@@ -63,7 +65,7 @@ void main()
     col1 = diffuse1 +specular1 ;
   }
   else {
-    col2 = vec4(0,0,0,0);
+    col1 = vec4(0,0,0,0);
   }
 
 if(light2On ){
@@ -71,9 +73,6 @@ if(light2On ){
     L = normalize( light - pos );
     E = normalize( -pos );
     H = normalize( L + E );
-    NN = vec4(vNormal,0);
-    // Transform vertex normal into eye coordinat
-    N = normalize( (modelViewMatrix*NN).xyz);
     // Compute terms in the illumination equation
     Kd = max( dot(L, N), 0.0 );
     vec4 diffuse2 = Kd*diffuseProduct;
@@ -94,9 +93,6 @@ if(light3On ){
     L = normalize( light - pos );
     E = normalize( -pos );
     H = normalize( L + E );
-    NN = vec4(vNormal,0);
-    // Transform vertex normal into eye coordinat
-    N = normalize( (modelViewMatrix*NN).xyz);
     // Compute terms in the illumination equation
     Kd = max( dot(L, N), 0.0 );
     vec4 diffuse3 = Kd*diffuseProduct;
